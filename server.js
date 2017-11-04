@@ -95,8 +95,8 @@ app.set('port', process.env.PORT || 3000);
 
 
 //openshift or local
-var ipaddress = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
-var port = process.env.OPENSHIFT_NODEJS_PORT || 3000; 
+//var ipaddress = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
+//var port = process.env.OPENSHIFT_NODEJS_PORT || 3000; 
 
 
 
@@ -219,7 +219,8 @@ res.send('500 - Server Error');
 
  });
 */
- app.listen(8080, function(){
+var port2 = 8080;
+ app.listen(port2, function(){
 
 
 
