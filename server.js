@@ -90,8 +90,13 @@ app.use(function(req, res, next) {
   next();
 });
 
+var port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080,
+    ip   = process.env.IP   || process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0',
+    mongoURL = process.env.OPENSHIFT_MONGODB_DB_URL || process.env.MONGO_URL,
+    mongoURLLabel = "";
 
-app.set('port', process.env.PORT || 3000);
+
+
 
 
 //openshift or local
@@ -102,32 +107,38 @@ app.set('port', process.env.PORT || 3000);
 
 //mongo connectionstring
 //mongodb configuration open shift
-var mongoHost = process.env.OPENSHIFT_MONGODB_DB_HOST || 'localhost';
-var mongoPort = process.env.OPENSHIFT_MONGODB_DB_PORT || 27017;
-var mongoUser = "admin"; //mongodb username
-var mongoPass = "Buz-S9gtgMTm"; //mongodb password
-var mongoDb   = "stationlocator"; //mongodb database name
+if (mongoURL == null && process.env.DATABASE_SERVICE_NAME) {
+  var mongoServiceName = process.env.DATABASE_SERVICE_NAME.toUpperCase(),
+      mongoHost = process.env[mongoServiceName + '_SERVICE_HOST'],
+      mongoPort = process.env[mongoServiceName + '_SERVICE_PORT'],
+      mongoDatabase = process.env[mongoServiceName + '_DATABASE'],
+      mongoPassword = process.env[mongoServiceName + '_PASSWORD']
+      mongoUser = process.env[mongoServiceName + '_USER'];
 
+  if (mongoHost && mongoPort && mongoDatabase) {
+    mongoURLLabel = mongoURL = 'mongodb://';
+    if (mongoUser && mongoPassword) {
+      mongoURL += mongoUser + ':' + mongoPassword + '@';
+    }
+    // Provide UI label that excludes user id and pw
+    mongoURLLabel += mongoHost + ':' + mongoPort + '/' + mongoDatabase;
+    mongoURL += mongoHost + ':' +  mongoPort + '/' + mongoDatabase;
 
-
-
-
-
-var mongoString = 'mongodb://' + mongoUser + ':' + mongoPass + '@' + mongoDb;
-
+  }
+}
 
 
 //OPEN SHIFT CHECK SERVER
-if (typeof process.env.OPENSHIFT_MONGODB_DB_HOST === "undefined") {
+/*if (typeof process.env.OPENSHIFT_MONGODB_DB_HOST === "undefined") {
     
     mongoString = "mongodb://localhost/stationlocator";
-  };
+  };*/
 
 
 
 
 //mongo connection
-mongoose.connect(mongoString);
+mongoose.connect(mongoURL);
 var db = mongoose.connection;
 db.on("error",function(error){
 console.log(error);
@@ -219,9 +230,9 @@ res.send('500 - Server Error');
 
  });
 */
-var port2 = 8080;
- app.listen(3000, function(){
 
+ app.listen(port, ip, function(){
 
+ 	console.log("server running...")
 
  });
